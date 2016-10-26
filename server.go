@@ -86,7 +86,7 @@ func delete(c echo.Context) error {
 }
 
 func initDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/golang")
+	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/BBS")
 
 	if err != nil {
 		fmt.Print(err)
