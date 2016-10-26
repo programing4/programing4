@@ -1,29 +1,29 @@
 package main
 
 import (
-        "database/sql"
-        "encoding/json"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
-        "fmt"
-        "log"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
-        _ "github.com/go-sql-driver/mysql"
 )
 
 type Datalice struct {
-        Datas []Data
-}               
-        
-type Data struct {
-        Id int
-        Name string
-        Entry string
-        Is_show bool
-        Create_at string
+	Datas []Data
 }
- 
+
+type Data struct {
+	Id        int
+	Name      string
+	Entry     string
+	Is_show   bool
+	Create_at string
+}
+
 type Hello struct {
 	Serve int
 }
@@ -39,33 +39,32 @@ func main() {
 }
 
 func get(c echo.Context) error {
-        	db := initDB()
-                rows, err := db.Query(
-                `select * from entries order by created_at;`,
-        )   
+	db := initDB()
+	rows, err := db.Query(
+		`select * from entries order by created_at;`,
+	)
 
-        var (
-                id int 
-                name string
-                entry string
-                is_show bool
-                create_at string
-        )   
+	var (
+		id        int
+		name      string
+		entry     string
+		is_show   bool
+		create_at string
+	)
 
-        var a Datalice
-        for rows.Next() {
-                err := rows.Scan(&id,&name,&entry,&is_show,&create_at)
-                if err != nil {
-                        log.Fatal(err)
-                }
-                a.Datas = append(a.Datas, Data{Id: id,Name: name,Entry:entry,Is_show:is_show,Create_at:create_at})
-        }
+	var a Datalice
+	for rows.Next() {
+		err := rows.Scan(&id, &name, &entry, &is_show, &create_at)
+		if err != nil {
+			log.Fatal(err)
+		}
+		a.Datas = append(a.Datas, Data{Id: id, Name: name, Entry: entry, Is_show: is_show, Create_at: create_at})
+	}
 
-        b, err := json.Marshal(a)
-        if err != nil {
-                fmt.Println("json err:", err)
-        }
-
+	b, err := json.Marshal(a)
+	if err != nil {
+		fmt.Println("json err:", err)
+	}
 
 	return c.String(http.StatusOK, string(b))
 }
@@ -86,12 +85,12 @@ func delete(c echo.Context) error {
 	return c.String(http.StatusOK, "delete:"+is_show+" !!")
 }
 
-func initDB() *sql.DB{
-        db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/golang")
+func initDB() *sql.DB {
+	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/golang")
 
-        if err != nil {
-            fmt.Print(err)
-        }
+	if err != nil {
+		fmt.Print(err)
+	}
 
-        return db
+	return db
 }
