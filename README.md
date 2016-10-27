@@ -12,3 +12,9 @@
 goose down
 goose up
 </pre>
+
+# 環境変数の設定
+~.zshrc に追加
+
+    export MYSQL_USERNAME="your_username"
+    export MYSQL_PASSWORD="your_password"
