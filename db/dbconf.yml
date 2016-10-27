@@ -1,3 +1,3 @@
 development:
     driver: mysql
-    open: root:root@/BBS
+    open: $MYSQL_USERNAME:$MYSQL_PASSWORD@/BBS

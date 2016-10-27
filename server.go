@@ -2,10 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
@@ -14,6 +12,10 @@ import (
 
 type Datalice struct {
 	Datas []Data
+}
+
+type MyHandler struct {
+	db *sql.DB
 }
 
 type Data struct {
@@ -29,44 +31,43 @@ type Hello struct {
 }
 
 func main() {
+	handler := &MyHandler{db: initDB()}
+	defer handler.db.Close()
 	e := echo.New()
 
-	e.GET("/hello", get)
+	e.GET("/hello", handler.get)
 	e.POST("/world", post)
 	e.PUT("/put", put)
 	e.DELETE("/delete", delete)
 	e.Run(standard.New(":4000"))
 }
 
-func get(c echo.Context) error {
-	db := initDB()
-	rows, err := db.Query(
+func (handler *MyHandler) get(c echo.Context) error {
+	rows, err := handler.db.Query(
 		`select * from entries order by created_at;`,
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	var (
-		id        int
-		name      string
-		entry     string
-		is_show   bool
-		create_at string
+		id         int
+		name       string
+		entry      string
+		is_show    bool
+		created_at string
 	)
 
-	var a Datalice
+	var entries Datalice
 	for rows.Next() {
-		err := rows.Scan(&id, &name, &entry, &is_show, &create_at)
+		err := rows.Scan(&id, &name, &entry, &is_show, &created_at)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
-		a.Datas = append(a.Datas, Data{Id: id, Name: name, Entry: entry, Is_show: is_show, Create_at: create_at})
+		entries.Datas = append(entries.Datas, Data{Id: id, Name: name, Entry: entry, Is_show: is_show, Create_at: created_at})
 	}
 
-	b, err := json.Marshal(a)
-	if err != nil {
-		fmt.Println("json err:", err)
-	}
-
-	return c.String(http.StatusOK, string(b))
+	return c.JSON(http.StatusOK, entries)
 }
 
 func post(c echo.Context) error {
@@ -86,10 +87,12 @@ func delete(c echo.Context) error {
 }
 
 func initDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/BBS")
+	user := os.Getenv("MYSQL_USERNAME")
+	pass := os.Getenv("MYSQL_PASSWORD")
+	db, err := sql.Open("mysql", user+":"+pass+"@tcp(localhost:3306)/BBS")
 
 	if err != nil {
-		fmt.Print(err)
+		panic(err)
 	}
 
 	return db
