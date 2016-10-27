@@ -19,15 +19,11 @@ type MyHandler struct {
 }
 
 type Data struct {
-	Id        int
-	Name      string
-	Entry     string
-	Is_show   bool
-	Create_at string
-}
-
-type Hello struct {
-	Serve int
+	Id         int
+	Name       string
+	Entry      string
+	Is_show    bool
+	Created_at string
 }
 
 func main() {
@@ -64,7 +60,7 @@ func (handler *MyHandler) get(c echo.Context) error {
 		if err != nil {
 			panic(err)
 		}
-		entries.Datas = append(entries.Datas, Data{Id: id, Name: name, Entry: entry, Is_show: is_show, Create_at: created_at})
+		entries.Datas = append(entries.Datas, Data{Id: id, Name: name, Entry: entry, Is_show: is_show, Created_at: created_at})
 	}
 
 	return c.JSON(http.StatusOK, entries)
