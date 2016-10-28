@@ -20,7 +20,7 @@ type Datalice struct {
 }
 
 type MyHandler struct {
-	db           *sql.DB
+	db *sql.DB
 }
 
 type Data struct {
