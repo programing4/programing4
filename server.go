@@ -2,9 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"os"
-	"encoding/json"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
@@ -15,24 +15,21 @@ type HttpStatus struct {
 	Status error
 }
 
-type MyError struct {
-}
-
 type Datalice struct {
-	Datas []Data		`json:"Datas"`
+	Datas []Data `json:"Datas"`
 }
 
 type MyHandler struct {
-	db *sql.DB
-        request_json *Datalice
+	db           *sql.DB
+	request_json *Datalice
 }
 
 type Data struct {
-	Id         int		`json:"id"`
-	Name       string	`json:"name"`
-	Entry      string	`json:"entry"`
-	Is_show    bool  	`json:"is_show"`
-	Created_at string	`json:"created_at"`
+	Id         int    `json:"id"`
+	Name       string `json:"name"`
+	Entry      string `json:"entry"`
+	Is_show    bool   `json:"is_show"`
+	Created_at string `json:"created_at"`
 }
 
 func main() {
@@ -76,16 +73,14 @@ func (handler *MyHandler) get(c echo.Context) error {
 }
 
 func (handler *MyHandler) post(c echo.Context) error {
-        //request json encoding
-        var request_json Data
-        body := c.Request().Body()
+	//request json encoding
+	var request_json Data
+	body := c.Request().Body()
 	decoder := json.NewDecoder(body)
-        decoder.Decode(&request_json)
+	decoder.Decode(&request_json)
 
-        
-        name := request_json.Name
-        entry := request_json.Entry
-
+	name := request_json.Name
+	entry := request_json.Entry
 
 	//insert database
 	_, err := handler.db.Query(
@@ -94,13 +89,13 @@ func (handler *MyHandler) post(c echo.Context) error {
 	)
 
 	//create response json
-        var stat = HttpStatus{Status: nil}
+	var stat = HttpStatus{Status: nil}
 
-        if err != nil {
-                stat.Status = err
-        }
+	if err != nil {
+		stat.Status = err
+	}
 
-        return c.JSON(http.StatusOK, stat)
+	return c.JSON(http.StatusOK, stat)
 }
 
 func put(c echo.Context) error {
