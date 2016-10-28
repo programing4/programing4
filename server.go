@@ -33,7 +33,7 @@ func main() {
 
 	e.GET("/hello", handler.get)
 	e.POST("/world", post)
-	e.PUT("/put", put)
+	e.PUT("/put", handler.put)
 	e.DELETE("/delete", delete)
 	e.Run(standard.New(":4000"))
 }
@@ -72,9 +72,17 @@ func post(c echo.Context) error {
 	return c.String(http.StatusOK, "Nice:"+text+" "+name+" !!")
 }
 
-func put(c echo.Context) error {
-	text := c.FormValue("text")
-	return c.String(http.StatusOK, "put:"+text+" !!")
+func (handler *MyHandler) put(c echo.Context) error {
+	id := c.FormValue("id")
+	name := c.FormValue("name")
+	entry := c.FormValue("entry")
+
+        _, err := handler.db.Query( 	
+		"UPDATE entries SET name = ? , entry = ? WHERE id = ?;",
+		 name, entry , id,
+	)
+
+        return err
 }
 
 func delete(c echo.Context) error {
