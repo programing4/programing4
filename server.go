@@ -11,6 +11,13 @@ import (
 	"github.com/labstack/echo/engine/standard"
 )
 
+type HttpStaus struct {
+	status bool
+}
+
+type MyError struct {
+}
+
 type Datalice struct {
 	Datas []Data		`json:"Datas"`
 }
@@ -70,15 +77,14 @@ func (handler *MyHandler) get(c echo.Context) error {
 
 func (handler *MyHandler) post(c echo.Context) error {
         //request json encoding
-        var request_json Datalice 
+        var request_json Data
         body := c.Request().Body()
 	decoder := json.NewDecoder(body)
         decoder.Decode(&request_json)
-	data := request_json.Datas
 
         
-        name := data[0].Name
-        entry := data[0].Entry
+        name := request_json.Name
+        entry := request_json.Entry
 
 	_, err := handler.db.Query(
 		"insert into entries (name,entry) values(?,?);",
