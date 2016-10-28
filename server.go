@@ -119,4 +119,3 @@ func initDB() *sql.DB {
 
 	return db
 }
-
