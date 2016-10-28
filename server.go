@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"os"
-        "encoding/json"
+	"encoding/json"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
@@ -34,7 +34,7 @@ func main() {
 	e := echo.New()
 
 	e.GET("/hello", handler.get)
-	e.POST("/world/", handler.post)
+	e.POST("/world", handler.post)
 	e.PUT("/put", put)
 	e.DELETE("/delete", delete)
 	e.Run(standard.New(":4000"))
@@ -109,4 +109,3 @@ func initDB() *sql.DB {
 
 	return db
 }
-
