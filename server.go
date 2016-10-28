@@ -38,7 +38,7 @@ func main() {
 
 	e.GET("/hello", handler.get)
 	e.POST("/world", handler.post)
-	e.PUT("/put", put)
+	e.PUT("/put", handler.put)
 	e.DELETE("/delete", delete)
 	e.Run(standard.New(":4000"))
 }
@@ -97,9 +97,30 @@ func (handler *MyHandler) post(c echo.Context) error {
 	return c.JSON(http.StatusOK, stat)
 }
 
-func put(c echo.Context) error {
-	text := c.FormValue("text")
-	return c.String(http.StatusOK, "put:"+text+" !!")
+func (handler *MyHandler) put(c echo.Context) error {
+	//request json encoding
+	var request_json Data
+	body := c.Request().Body()
+	decoder := json.NewDecoder(body)
+	decoder.Decode(&request_json)
+
+	id := request_json.Id
+	name := request_json.Name
+	entry := request_json.Entry
+
+	_, err := handler.db.Query(
+		"UPDATE entries SET name = ? , entry = ? WHERE id = ?;",
+		name, entry, id,
+	)
+
+	//create response json
+	var stat = HttpStatus{Status: nil}
+
+	if err != nil {
+		stat.Status = err
+	}
+
+	return c.JSON(http.StatusOK, stat)
 }
 
 func delete(c echo.Context) error {
