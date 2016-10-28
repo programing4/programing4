@@ -16,7 +16,7 @@ type HttpStatus struct {
 }
 
 type Datalice struct {
-	Datas []Data `json:"Datas"`
+	Datas []Data
 }
 
 type MyHandler struct {
@@ -25,11 +25,11 @@ type MyHandler struct {
 }
 
 type Data struct {
-	Id         int    `json:"id"`
-	Name       string `json:"name"`
-	Entry      string `json:"entry"`
-	Is_show    bool   `json:"is_show"`
-	Created_at string `json:"created_at"`
+	Id         int
+	Name       string
+	Entry      string
+	Is_show    bool
+	Created_at string
 }
 
 func main() {
