@@ -11,8 +11,8 @@ import (
 	"github.com/labstack/echo/engine/standard"
 )
 
-type HttpStaus struct {
-	status bool
+type HttpStatus struct {
+	Status error
 }
 
 type MyError struct {
@@ -86,12 +86,21 @@ func (handler *MyHandler) post(c echo.Context) error {
         name := request_json.Name
         entry := request_json.Entry
 
+
+	//insert database
 	_, err := handler.db.Query(
 		"insert into entries (name,entry) values(?,?);",
 		name, entry,
 	)
 
-        return err
+	//create response json
+        var stat = HttpStatus{Status: nil}
+
+        if err != nil {
+                stat.Status = err
+        }
+
+        return c.JSON(http.StatusOK, stat)
 }
 
 func put(c echo.Context) error {
