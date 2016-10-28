@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"os"
+        "encoding/json"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
@@ -11,19 +12,20 @@ import (
 )
 
 type Datalice struct {
-	Datas []Data
+	Datas []Data		`json:"Datas"`
 }
 
 type MyHandler struct {
 	db *sql.DB
+        request_json *Datalice
 }
 
 type Data struct {
-	Id         int
-	Name       string
-	Entry      string
-	Is_show    bool
-	Created_at string
+	Id         int		`json:"id"`
+	Name       string	`json:"name"`
+	Entry      string	`json:"entry"`
+	Is_show    bool  	`json:"is_show"`
+	Created_at string	`json:"created_at"`
 }
 
 func main() {
@@ -32,7 +34,7 @@ func main() {
 	e := echo.New()
 
 	e.GET("/hello", handler.get)
-	e.POST("/world/:name/:entry", handler.post)
+	e.POST("/world/", handler.post)
 	e.PUT("/put", put)
 	e.DELETE("/delete", delete)
 	e.Run(standard.New(":4000"))
@@ -67,11 +69,19 @@ func (handler *MyHandler) get(c echo.Context) error {
 }
 
 func (handler *MyHandler) post(c echo.Context) error {
-	name := c.Param("name")
-	entry := c.Param("entry")
+        //request json encoding
+        var request_json Datalice 
+        body := c.Request().Body()
+	decoder := json.NewDecoder(body)
+        decoder.Decode(&request_json)
+	data := request_json.Datas
+
+        
+        name := data[0].Name
+        entry := data[0].Entry
 
 	_, err := handler.db.Query(
-		"insert into entries (name,entry) values(?,?)",
+		"insert into entries (name,entry) values(?,?);",
 		name, entry,
 	)
 
