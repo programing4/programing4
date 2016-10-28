@@ -32,7 +32,7 @@ func main() {
 	e := echo.New()
 
 	e.GET("/hello", handler.get)
-	e.POST("/world", post)
+	e.POST("/world/:name/:entry", handler.post)
 	e.PUT("/put", put)
 	e.DELETE("/delete", delete)
 	e.Run(standard.New(":4000"))
@@ -66,10 +66,16 @@ func (handler *MyHandler) get(c echo.Context) error {
 	return c.JSON(http.StatusOK, entries)
 }
 
-func post(c echo.Context) error {
-	text := c.FormValue("text")
-	name := c.FormValue("name")
-	return c.String(http.StatusOK, "Nice:"+text+" "+name+" !!")
+func (handler *MyHandler) post(c echo.Context) error {
+	name := c.Param("name")
+	entry := c.Param("entry")
+
+	_, err := handler.db.Query(
+		"insert into entries (name,entry) values(?,?)",
+		name, entry,
+	)
+
+        return err
 }
 
 func put(c echo.Context) error {
@@ -93,3 +99,4 @@ func initDB() *sql.DB {
 
 	return db
 }
+
