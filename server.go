@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"os"
 
@@ -9,6 +10,10 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 )
+
+type HttpStatus struct {
+	Status error
+}
 
 type Datalice struct {
 	Datas []Data
@@ -73,16 +78,29 @@ func post(c echo.Context) error {
 }
 
 func (handler *MyHandler) put(c echo.Context) error {
-	id := c.FormValue("id")
-	name := c.FormValue("name")
-	entry := c.FormValue("entry")
+	//request json encoding
+	var request_json Data
+	body := c.Request().Body()
+	decoder := json.NewDecoder(body)
+	decoder.Decode(&request_json)
 
-        _, err := handler.db.Query( 	
+	id := request_json.Id
+	name := request_json.Name
+	entry := request_json.Entry
+
+	_, err := handler.db.Query(
 		"UPDATE entries SET name = ? , entry = ? WHERE id = ?;",
-		 name, entry , id,
+		name, entry, id,
 	)
 
-        return err
+	//create response json
+	var stat = HttpStatus{Status: nil}
+
+	if err != nil {
+		stat.Status = err
+	}
+
+	return c.JSON(http.StatusOK, stat)
 }
 
 func delete(c echo.Context) error {
@@ -101,3 +119,4 @@ func initDB() *sql.DB {
 
 	return db
 }
+
