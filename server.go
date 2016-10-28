@@ -21,7 +21,6 @@ type Datalice struct {
 
 type MyHandler struct {
 	db           *sql.DB
-	request_json *Datalice
 }
 
 type Data struct {
