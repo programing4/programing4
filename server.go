@@ -1,5 +1,6 @@
 package main
 
+
 import (
 	"database/sql"
 	"encoding/json"
@@ -36,10 +37,17 @@ func main() {
 	defer handler.db.Close()
 	e := echo.New()
 
+<<<<<<< HEAD
 	e.GET("/get", handler.get)
 	e.POST("/post", handler.post)
 	e.PUT("/put", handler.put)
 	e.DELETE("/delete", handler.delete)
+=======
+	e.GET("/hello", handler.get)
+	e.POST("/world", handler.post)
+	e.PUT("/put", handler.put)
+	e.DELETE("/delete", delete)
+>>>>>>> delete/master
 	e.Run(standard.New(":4000"))
 }
 
@@ -69,6 +77,7 @@ func (handler *MyHandler) get(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, entries)
+<<<<<<< HEAD
 }
 
 func (handler *MyHandler) post(c echo.Context) error {
@@ -98,12 +107,18 @@ func (handler *MyHandler) post(c echo.Context) error {
 }
 
 func (handler *MyHandler) put(c echo.Context) error {
+=======
+}
+
+func (handler *MyHandler) post(c echo.Context) error {
+>>>>>>> delete/master
 	//request json encoding
 	var request_json Data
 	body := c.Request().Body()
 	decoder := json.NewDecoder(body)
 	decoder.Decode(&request_json)
 
+<<<<<<< HEAD
 	id := request_json.Id
 	name := request_json.Name
 	entry := request_json.Entry
@@ -111,6 +126,15 @@ func (handler *MyHandler) put(c echo.Context) error {
 	_, err := handler.db.Query(
 		"UPDATE entries SET name = ? , entry = ? WHERE id = ?;",
 		name, entry, id,
+=======
+	name := request_json.Name
+	entry := request_json.Entry
+
+	//insert database
+	_, err := handler.db.Query(
+		"insert into entries (name,entry) values(?,?);",
+		name, entry,
+>>>>>>> delete/master
 	)
 
 	//create response json
@@ -123,24 +147,57 @@ func (handler *MyHandler) put(c echo.Context) error {
 	return c.JSON(http.StatusOK, stat)
 }
 
+<<<<<<< HEAD
 func (handler *MyHandler) delete(c echo.Context) error {
+=======
+func (handler *MyHandler) put(c echo.Context) error {
+	//request json encoding
+>>>>>>> delete/master
 	var request_json Data
 	body := c.Request().Body()
 	decoder := json.NewDecoder(body)
 	decoder.Decode(&request_json)
 
 	id := request_json.Id
+<<<<<<< HEAD
 
 	_, err := handler.db.Query(
 		`update entries set is_show=0 where id = ?;`,
 		id,
 	)
+=======
+	name := request_json.Name
+	entry := request_json.Entry
+
+	_, err := handler.db.Query(
+		"UPDATE entries SET name = ? , entry = ? WHERE id = ?;",
+		name, entry, id,
+	)
+
+	//create response json
+>>>>>>> delete/master
 	var stat = HttpStatus{Status: nil}
 
 	if err != nil {
 		stat.Status = err
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> delete/master
 	return c.JSON(http.StatusOK, stat)
+}
+
+func initDB() *sql.DB {
+	user := os.Getenv("MYSQL_USERNAME")
+	pass := os.Getenv("MYSQL_PASSWORD")
+	db, err := sql.Open("mysql", user+":"+pass+"@tcp(localhost:3306)/BBS")
+
+	if err != nil {
+		panic(err)
+	}
+
+	return db
 }
 
 func initDB() *sql.DB {
